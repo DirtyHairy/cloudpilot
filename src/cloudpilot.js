@@ -1473,11 +1473,11 @@ function updateGlobalBufferAndViews(buf) {
 }
 
 var STATIC_BASE = 1024,
-    STACK_BASE = 663648,
+    STACK_BASE = 664080,
     STACKTOP = STACK_BASE,
-    STACK_MAX = 5906528,
-    DYNAMIC_BASE = 5906528,
-    DYNAMICTOP_PTR = 663456;
+    STACK_MAX = 5906960,
+    DYNAMIC_BASE = 5906960,
+    DYNAMICTOP_PTR = 663888;
 
 assert(STACK_BASE % 16 === 0, 'stack must start aligned');
 assert(DYNAMIC_BASE % 16 === 0, 'heap must start aligned');
@@ -2108,7 +2108,7 @@ function _emscripten_asm_const_iiii(code, a0, a1, a2) {
 
 
 
-// STATICTOP = STATIC_BASE + 662624;
+// STATICTOP = STATIC_BASE + 663056;
 /* global initializers */  __ATINIT__.push({ func: function() { globalCtors() } });
 
 
@@ -2119,7 +2119,7 @@ function _emscripten_asm_const_iiii(code, a0, a1, a2) {
 
 
 /* no memory initializer */
-var tempDoublePtr = 663632;
+var tempDoublePtr = 664064;
 
 function copyTempFloat(ptr) { // functions, because inlining this code increases code size too much
   HEAP8[tempDoublePtr] = HEAP8[ptr];
@@ -8884,7 +8884,7 @@ function copyTempDouble(ptr) {
     }
 
   
-  var ___tm_timezone=(stringToUTF8("GMT", 663536, 4), 663536);
+  var ___tm_timezone=(stringToUTF8("GMT", 663968, 4), 663968);
   
   function _tzset() {
       // TODO: Use (malleable) environment variables instead of system settings.
@@ -9364,7 +9364,7 @@ function copyTempDouble(ptr) {
       return _strftime(s, maxsize, format, tm); // no locale support yet
     }
 
-  var ___dso_handle=663472;
+  var ___dso_handle=663904;
 
   function readAsmConstArgs(sigPtr, buf) {
       if (!readAsmConstArgs.array) {
@@ -10016,8 +10016,10 @@ var dynCall_viijii = Module["dynCall_viijii"] = function() {
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
   return Module["asm"]["dynCall_viijii"].apply(null, arguments)
 };
-Module['__ZZNKSt3__27num_putIwNS_19ostreambuf_iteratorIwNS_11char_traitsIwEEEEE6do_putES4_RNS_8ios_baseEwPKvE5__fmt'] = 117643;
-Module['__ZZNKSt3__27num_putIwNS_19ostreambuf_iteratorIwNS_11char_traitsIwEEEEE6do_putES4_RNS_8ios_baseEwmE5__fmt'] = 117654;;
+Module['__ZZN8MainLoop12updateScreenEvE4dest'] = 76200;
+Module['__ZZN8MainLoop14drawSilkscreenEP12SDL_RendererE4rect'] = 76216;
+Module['__ZZNKSt3__27num_putIwNS_19ostreambuf_iteratorIwNS_11char_traitsIwEEEEE6do_putES4_RNS_8ios_baseEwPKvE5__fmt'] = 117851;
+Module['__ZZNKSt3__27num_putIwNS_19ostreambuf_iteratorIwNS_11char_traitsIwEEEEE6do_putES4_RNS_8ios_baseEwmE5__fmt'] = 117862;;
 
 
 /**
