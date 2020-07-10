@@ -62,7 +62,7 @@
         <button type="button" id="rom-upload-button">Select ROM</button>
     </label>
     <label>
-        <input type="file" id="file-upload" multiple accept=".prc,.pdb"></input>
+        <input type="file" id="file-upload" multiple></input>
         <button type="button" id="file-upload-button">Install file</button>
     </label>
     <canvas id="canvas" width="160" height="220"></canvas>
@@ -82,7 +82,183 @@
 
     <script src="src/cloudpilot.js"></script>
     <script>
-        (function () {
+        (async function () {
+            const DB_NAME = 'cloudpilot-sdl';
+            const OBJECT_STORE_KVS = 'kvs';
+            const OBJECT_STORE_MEMORY = 'memory';
+
+            const KEY_ROM_NAME = 'romName';
+            const KEY_ROM_IMAGE = 'romImage';
+            const KEY_ROM_MEMORY_SIZE = "memorySize";
+
+            class Kvs {
+                constructor(db) {
+                    this.db = db;
+                }
+
+                get(key) {
+                    const transaction = this.db.transaction(OBJECT_STORE_KVS, 'readonly');
+                    const request = transaction.objectStore(OBJECT_STORE_KVS).get(key);
+
+                    return new Promise((resolve, reject) => {
+                        request.onerror = () => reject(new Error('error reading from KVS'));
+                        request.onsuccess = () => resolve(request.result);
+                    })
+                }
+
+                put(key, value) {
+                    const transaction = this.db.transaction(OBJECT_STORE_KVS, 'readwrite');
+                    const request = transaction.objectStore(OBJECT_STORE_KVS).put(value, key);
+
+                    return new Promise((resolve, reject) => {
+                        request.onerror = () => reject(new Error('error writing to KVS'));
+                        request.onsuccess = () => resolve();
+                    });
+                }
+
+                delete(key) {
+                    const transaction = this.db.transaction(OBJECT_STORE_KVS, 'readwrite');
+                    const request = transaction.objectStore(OBJECT_STORE_KVS).delete(key);
+
+                    return new Promise((resolve, reject) => {
+                        request.onerror = () => reject(new Error('error deleting from KVS'));
+                        request.onsuccess = () => resolve();
+                    });
+                }
+            }
+
+            class MemoryPersistence {
+                constructor(db, size, module) {
+                    this.db = db;
+                    this.size = size;
+                    this.module = module;
+
+                    const pageCount = (size >>> 10) + (size % 1024 ? 1 : 0);
+                    this.dirtyPages = new Uint8Array((pageCount >> 3) + (pageCount % 8 ? 1 : 0));
+
+                    this.pages = new Array(pageCount);
+                    for (let i = 0; i < pageCount; i++) this.pages[i] = new Int8Array(1024);
+
+                    this.transaction = null;
+
+                    this.dirtyPagesPtr = module.cwrap('dirtyPagesPtr', 'number', []);
+                    this.memoryPtr = module.cwrap('memoryPtr', 'number', []);
+
+                    this.intervalHandle = null;
+                }
+
+                start() {
+                    if (this.intervalHandle !== null) return;
+
+                    this.intervalHandle = setInterval(() => this.snapshot(), 1000);
+                }
+
+                snapshot() {
+                    if (this.transaction) return;
+
+                    let iPage = 0;
+                    const dirtyPages = this.getDirtyPages();
+                    const memory = this.getMemory();
+
+                    this.transaction = this.db.transaction(OBJECT_STORE_MEMORY, 'readwrite');
+                    const objectStore = this.transaction.objectStore(OBJECT_STORE_MEMORY);
+
+                    for (let i = 0; i < dirtyPages.length; i++) {
+                        this.dirtyPages[i] |= dirtyPages[i];
+                        dirtyPages[i] = 0;
+
+                        if (this.dirtyPages[i] == 0) {
+                            iPage += 8;
+                            continue;
+                        }
+
+                        for (let j = 0; j < 8; j++) {
+                            if (this.dirtyPages[i] & (1 << j)) {
+                                this.pages[iPage].set(memory.subarray(iPage * 1024, (iPage + 1) * 1024));
+
+                                objectStore.put(this.pages[iPage], iPage);
+                            }
+
+                            iPage++;
+                        }
+                    }
+
+                    this.transaction.oncomplete = () => {
+                        this.dirtyPages.fill(0);
+                        this.transaction = null;
+                    }
+
+                    this.transaction.onerror = () => {
+                        console.error('failed to save page dump');
+                        this.transaction = null;
+                    }
+                }
+
+                stop() {
+                    if (this.transaction) {
+                        this.transaction.abort();
+                        this.transaction = null;
+                    }
+
+                    if (this.intervalHandle !== null) {
+                        clearInterval(this.intervalHandle);
+                        this.intervalHandle = null
+                    }
+                }
+
+                loadMemoryImage() {
+                    return new Promise((resolve, reject) => {
+                        const image = new Int8Array(this.size);
+
+                        const transaction = this.db.transaction(OBJECT_STORE_MEMORY, 'readonly');
+                        const request = transaction.objectStore(OBJECT_STORE_MEMORY).openCursor();
+
+                        request.onsuccess = () => {
+                            const cursor = request.result;
+
+                            if (!cursor) return resolve(image);
+
+                            const page = request.result.value;
+                            const iPage = request.result.key;
+
+                            if (iPage * 1024 < this.size) {
+                                image.subarray(iPage * 1024, Math.min((iPage + 1) * 1024, this.size)).set(page);
+                            }
+
+                            cursor.continue();
+                        }
+
+                        request.onerror = () => reject(new Error("failed to load memory image"));
+                    })
+                }
+
+                reset() {
+                    if (this.intervalHandle) {
+                        throw new Error("reset called on running MemoryPersistence instance");
+                    }
+
+                    const transaction = this.db.transaction(OBJECT_STORE_MEMORY, 'readwrite');
+                    transaction.objectStore(OBJECT_STORE_MEMORY).clear();
+
+                    return new Promise((resolve, reject) => {
+                        transaction.oncomplete = () => resolve();
+                        transaction.onerror = () => reject(new Error('failed to clear stored memory'));
+                    })
+                }
+
+                getDirtyPages() {
+                    const dirtyPagesPtr = this.dirtyPagesPtr();
+
+                    return this.module.HEAP8.subarray(dirtyPagesPtr, dirtyPagesPtr + this.dirtyPages.length);
+                }
+
+                getMemory() {
+                    const memoryPtr = this.memoryPtr();
+
+                    return this.module.HEAP8.subarray(memoryPtr, memoryPtr + this.size);
+                }
+            }
+
             const romUploadButton = document.getElementById('rom-upload-button');
             const romUpload = document.getElementById('rom-upload');
 
@@ -92,10 +268,9 @@
             const romName = document.getElementById('rom-name');
             const consoleElt = document.getElementById('console');
 
-            const KEY_ROM_NAME = 'romName';
-            const KEY_ROM_IMAGE = 'romImage';
-
-            let running = false;
+            const db = await openDb();
+            const kvs = new Kvs(db);
+            let memoryPersistence;
 
             function escape(text) {
                 const node = document.createElement('div');
@@ -110,7 +285,7 @@
                 consoleElt.scrollTop = consoleElt.scrollHeight;
             }
 
-            function onSessionReady() {
+            async function onSessionReady() {
                 const nativeButtonDown = this.cwrap('buttonDown', null, ['string']);
                 const nativeButtonUp = this.cwrap('buttonUp', null, ['string']);
 
@@ -145,15 +320,45 @@
                     },
                     true
                 );
+
+                const memorySize = this.ccall('memorySize', 'number', [], []);
+
+                if (!memoryPersistence) {
+                    memoryPersistence = new MemoryPersistence(db, memorySize, this);
+                }
+                memoryPersistence.start();
+
+                await kvs.put(KEY_ROM_MEMORY_SIZE, memorySize);
+            }
+
+            function openDb() {
+                return new Promise((resolve, reject) => {
+                    const request = window.indexedDB.open(DB_NAME, 1);
+
+                    request.onerror = e => reject(new Error('failed to open DB'));
+                    request.onsuccess = () => resolve(request.result);
+
+                    request.onupgradeneeded = () => {
+                        request.result.createObjectStore(OBJECT_STORE_KVS);
+                        request.result.createObjectStore(OBJECT_STORE_MEMORY);
+                    }
+                });
             }
 
             async function main(module) {
-                function launch() {
-                    romName.innerText = `ROM: ${localStorage.getItem(KEY_ROM_NAME)}`;
-                    running = true;
+                async function launch() {
+                    romName.innerText = `ROM: ${await (kvs.get(KEY_ROM_NAME))}`;
 
-                    module.FS.writeFile('/palm.rom', Uint8Array.from(atob(localStorage.getItem(KEY_ROM_IMAGE)), c => c.charCodeAt(0)));
-                    module.callMain(['/palm.rom']);
+                    module.FS.writeFile('/palm.rom', await kvs.get(KEY_ROM_IMAGE));
+                    const args = ['/palm.rom'];
+
+                    if (memoryPersistence) {
+                        const memoryImage = await memoryPersistence.loadMemoryImage()
+                        module.FS.writeFile('/memory.bin', memoryImage);
+                        args.push('/memory.bin');
+                    }
+
+                    module.callMain(args);
                 }
 
                 async function processUpload(file) {
@@ -173,21 +378,22 @@
 
                     const content = await processUpload(file);
 
-                    let str = '';
-                    for (let x of content) str += String.fromCharCode(x);
+                    await kvs.put(KEY_ROM_NAME, file.name);
+                    await kvs.put(KEY_ROM_IMAGE, content);
+                    await kvs.delete(KEY_ROM_MEMORY_SIZE);
 
-                    localStorage.setItem(KEY_ROM_NAME, file.name);
-                    localStorage.setItem(KEY_ROM_IMAGE, btoa(str));
-
-                    if (!running) {
-                        launch();
-                    } else {
-                        window.location.reload();
+                    if (memoryPersistence) {
+                        memoryPersistence.stop();
+                        await memoryPersistence.reset();
                     }
+
+                    window.location.reload();
                 }
 
                 async function onFileUpload(e) {
                     for (const file of e.target.files) {
+                        if (!file.name.match(/\.(prc|pdb)$/i)) continue;
+
                         const content = await processUpload(file);
 
                         const bufferPtr = module._malloc(content.length);
@@ -201,27 +407,33 @@
 
                 window.module = module;
 
+                const memorySize = await (kvs.get(KEY_ROM_MEMORY_SIZE));
+                if (memorySize) {
+                    memoryPersistence = new MemoryPersistence(db, memorySize, module);
+                }
+
                 romUploadButton.addEventListener('click', () => romUpload.click());
                 romUpload.addEventListener('change', onRomFileSelect);
 
                 fileUploadButton.addEventListener('click', () => fileUpload.click());
                 fileUpload.addEventListener('change', onFileUpload);
 
-                if (localStorage.getItem(KEY_ROM_NAME) && localStorage.getItem(KEY_ROM_IMAGE)) {
-                    launch();
+                if (await kvs.get(KEY_ROM_NAME) && await kvs.get(KEY_ROM_IMAGE)) {
+                    await launch();
                 } else {
                     romName.innerText = 'No ROM image selected';
                 }
             }
 
-            createModule({
+            const module = await createModule({
                 noInitialRun: true,
                 canvas: document.getElementById('canvas'),
                 print: appendLog,
                 printErr: appendLog,
                 sessionReady: onSessionReady
-            })
-                .then(main);
+            });
+
+            main(module);
         })()
     </script>
 </body>
