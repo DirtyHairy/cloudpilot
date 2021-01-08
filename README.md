@@ -1,6 +1,6 @@
 # What is this?
 
-This is an attempt to build an emulator for PalmOS devices that runs on the
+This is an emulator for PalmOS devices that runs on the
 web. The code is based of the source code of POSE 3.5, compiled to web
 assembly via emscripten.
 
