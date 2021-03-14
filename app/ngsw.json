@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1615645085786,
+  "timestamp": 1615763032971,
   "index": "/cloudpilot/app/index.html",
   "assetGroups": [
     {
@@ -117,16 +117,16 @@
         "/cloudpilot/app/60-es5.ae0665ddda6fab9948c6.js",
         "/cloudpilot/app/61-es2015.a2df68026cfc8ed36177.js",
         "/cloudpilot/app/61-es5.a2df68026cfc8ed36177.js",
-        "/cloudpilot/app/62-es2015.8110e9ecb0fbdfe27436.js",
-        "/cloudpilot/app/62-es5.8110e9ecb0fbdfe27436.js",
-        "/cloudpilot/app/63-es2015.b57443398b6ff7a7e3eb.js",
-        "/cloudpilot/app/63-es5.b57443398b6ff7a7e3eb.js",
+        "/cloudpilot/app/62-es2015.319a70e74ea3560a10da.js",
+        "/cloudpilot/app/62-es5.319a70e74ea3560a10da.js",
+        "/cloudpilot/app/63-es2015.2db5533317ffe4935fa1.js",
+        "/cloudpilot/app/63-es5.2db5533317ffe4935fa1.js",
         "/cloudpilot/app/cloudpilot_web.wasm",
         "/cloudpilot/app/common-es2015.88b7c31a519a94835c1e.js",
         "/cloudpilot/app/common-es5.88b7c31a519a94835c1e.js",
         "/cloudpilot/app/index.html",
-        "/cloudpilot/app/main-es2015.15ade2c54fc841700d67.js",
-        "/cloudpilot/app/main-es5.15ade2c54fc841700d67.js",
+        "/cloudpilot/app/main-es2015.da5e981dd3011ab9a856.js",
+        "/cloudpilot/app/main-es5.da5e981dd3011ab9a856.js",
         "/cloudpilot/app/manifest.webmanifest",
         "/cloudpilot/app/polyfills-core-js-es2015.889538a5be7d1852e8ce.js",
         "/cloudpilot/app/polyfills-core-js-es5.889538a5be7d1852e8ce.js",
@@ -136,8 +136,8 @@
         "/cloudpilot/app/polyfills-dom-es5.9e177b67cdd001dde465.js",
         "/cloudpilot/app/polyfills-es2015.142de413ff9e832343da.js",
         "/cloudpilot/app/polyfills-es5.7dbc060f131d1ba284a7.js",
-        "/cloudpilot/app/runtime-es2015.c98295913545a546f3d5.js",
-        "/cloudpilot/app/runtime-es5.c98295913545a546f3d5.js",
+        "/cloudpilot/app/runtime-es2015.b7ee2f6c1ed5584e45ba.js",
+        "/cloudpilot/app/runtime-es5.b7ee2f6c1ed5584e45ba.js",
         "/cloudpilot/app/styles.b90531eb9c5954f757a1.css"
       ],
       "patterns": []
@@ -179,7 +179,9 @@
         "/cloudpilot/app/svg/phone-portrait-outline.svg",
         "/cloudpilot/app/svg/power-outline.svg",
         "/cloudpilot/app/svg/save-outline.svg",
-        "/cloudpilot/app/svg/trash-outline.svg"
+        "/cloudpilot/app/svg/trash-outline.svg",
+        "/cloudpilot/app/svg/volume-high-outline.svg",
+        "/cloudpilot/app/svg/volume-mute-outline.svg"
       ],
       "patterns": []
     }
@@ -292,10 +294,10 @@
     "/cloudpilot/app/60-es5.ae0665ddda6fab9948c6.js": "5d6eaf6715fbbd8faa9588810890f97b0800e4a5",
     "/cloudpilot/app/61-es2015.a2df68026cfc8ed36177.js": "627a97eab5ea9ca68f33c1cfd6dcf993f3ebb602",
     "/cloudpilot/app/61-es5.a2df68026cfc8ed36177.js": "c920fdcd193913efa78d964c97f3383911242352",
-    "/cloudpilot/app/62-es2015.8110e9ecb0fbdfe27436.js": "9a144c97cf0b99c0d3d5c3cfddd08c12a50f09f1",
-    "/cloudpilot/app/62-es5.8110e9ecb0fbdfe27436.js": "313fd638c277ca6edd0950e9dca2b56dae2ff0c8",
-    "/cloudpilot/app/63-es2015.b57443398b6ff7a7e3eb.js": "194edee7ec95874aee8adf583a9532c07a7fc2f1",
-    "/cloudpilot/app/63-es5.b57443398b6ff7a7e3eb.js": "f50778bebde4d2a96ae2a238f74d96bb74ca0491",
+    "/cloudpilot/app/62-es2015.319a70e74ea3560a10da.js": "2671624d399de66cad2f45afc9470016d14a2295",
+    "/cloudpilot/app/62-es5.319a70e74ea3560a10da.js": "c01f0c2614f05c593c9f0e2d8741ef246791f2ab",
+    "/cloudpilot/app/63-es2015.2db5533317ffe4935fa1.js": "1ebcb1e8293b41f32f82bf9af9febbf8a84afb4a",
+    "/cloudpilot/app/63-es5.2db5533317ffe4935fa1.js": "f86fa2f27b4e568aae9d7736b6d8dc69420d1cf4",
     "/cloudpilot/app/assets/doc/emulation.md": "596779e8ca870dd327b8aac40acf00854e464397",
     "/cloudpilot/app/assets/doc/sessions.md": "1e6b998e51412fbde0533d6ff5e2cec2c1789d7a",
     "/cloudpilot/app/assets/doc/settings.md": "7494958cdff02f32f094638514cadee803c3f961",
@@ -313,12 +315,12 @@
     "/cloudpilot/app/assets/shapes.svg": "5413e95adabcb2cb639970051f55e0ddb64ace53",
     "/cloudpilot/app/assets/silkscreen-default.svg": "33b01d3789c8aff621cc97b44d8294b1fb7aad6a",
     "/cloudpilot/app/assets/silkscreen-m515.svg": "eec79a46076c4033120bd5f1bc69f37c04af1dc4",
-    "/cloudpilot/app/cloudpilot_web.wasm": "707210ca2b7cf445ce8c654d516b21c4a10044e6",
+    "/cloudpilot/app/cloudpilot_web.wasm": "34140ad72a7ac30ac1c7ba045ad404041cf8172d",
     "/cloudpilot/app/common-es2015.88b7c31a519a94835c1e.js": "ab0bd8c137870f6563dede4a0090b7abbfa9d806",
     "/cloudpilot/app/common-es5.88b7c31a519a94835c1e.js": "120e9573175ef81dd555b6650152d84b39d97843",
-    "/cloudpilot/app/index.html": "0348db503a2ae2e9a13bd31abe86e887027d28f6",
-    "/cloudpilot/app/main-es2015.15ade2c54fc841700d67.js": "8c8d7c3cb46dd6117856f1316738fbf0ea60239e",
-    "/cloudpilot/app/main-es5.15ade2c54fc841700d67.js": "53da5d5ae35ce45b7886c28c8eed66e74b2abebf",
+    "/cloudpilot/app/index.html": "fa73a94cc57938161a774c2ae87412396c0d3278",
+    "/cloudpilot/app/main-es2015.da5e981dd3011ab9a856.js": "a30b5a9a3dcc9e5ae331c73b8f3d268b7ac7d8bc",
+    "/cloudpilot/app/main-es5.da5e981dd3011ab9a856.js": "e37e2419d9ca9713c58ee8e112bf9541e1c3e2a6",
     "/cloudpilot/app/manifest.webmanifest": "0a126524966482ca3db8a1a12fe2991f0d5127bb",
     "/cloudpilot/app/polyfills-core-js-es2015.889538a5be7d1852e8ce.js": "f71279ef311f3c1cecc661b8aabe632959a282f8",
     "/cloudpilot/app/polyfills-core-js-es5.889538a5be7d1852e8ce.js": "ef94a2815cc399cb7888d8fbab75ea5fbdc275b3",
@@ -328,8 +330,8 @@
     "/cloudpilot/app/polyfills-dom-es5.9e177b67cdd001dde465.js": "3d12740300342a24e404779d9c0a06c58f44ec7c",
     "/cloudpilot/app/polyfills-es2015.142de413ff9e832343da.js": "6ba19822f28c72e2a03abb2ae8ec72070017ba83",
     "/cloudpilot/app/polyfills-es5.7dbc060f131d1ba284a7.js": "5c827507ba024580d8e5ff45782a8e1725ed0925",
-    "/cloudpilot/app/runtime-es2015.c98295913545a546f3d5.js": "077f839420fa70d2eb2d1b8d987245f8b5449e96",
-    "/cloudpilot/app/runtime-es5.c98295913545a546f3d5.js": "0b3226849499143825ff4cea7ef832f1c28db3b0",
+    "/cloudpilot/app/runtime-es2015.b7ee2f6c1ed5584e45ba.js": "a05a77d28f3946aac9590a363331c5d7313c5329",
+    "/cloudpilot/app/runtime-es5.b7ee2f6c1ed5584e45ba.js": "d50cc63ced65d37b6651cca874929afba38118c7",
     "/cloudpilot/app/styles.b90531eb9c5954f757a1.css": "54cea12bcba483376a503f8129ffb6fc11e9de49",
     "/cloudpilot/app/svg/add-outline.svg": "eb541d22f6af3413b0e23ead0b37ff1a70b1de6a",
     "/cloudpilot/app/svg/albums-outline.svg": "b8e184c0d37c51050c4e92b9b579da2ff9296d8e",
@@ -343,7 +345,9 @@
     "/cloudpilot/app/svg/phone-portrait-outline.svg": "d9b479b407ae9076064461a08c620e33b28dd61a",
     "/cloudpilot/app/svg/power-outline.svg": "8cc06f4fda1ceecbfed396399f95c0e17c617d14",
     "/cloudpilot/app/svg/save-outline.svg": "6925e34439caf7704186a3fb7fc3f825c89725f2",
-    "/cloudpilot/app/svg/trash-outline.svg": "8f617bd5577f01effa55c62be8c78972a7d22f4f"
+    "/cloudpilot/app/svg/trash-outline.svg": "8f617bd5577f01effa55c62be8c78972a7d22f4f",
+    "/cloudpilot/app/svg/volume-high-outline.svg": "0c35a53d16410fdd3c288f9adaca265cb456bede",
+    "/cloudpilot/app/svg/volume-mute-outline.svg": "08e5b8d451544a404c645ec35af77824a0ea6276"
   },
   "navigationUrls": [
     {
