@@ -95,6 +95,45 @@
         #snapshot-indicator {
             margin-top: 1em;
         }
+
+        #modal-container {
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #modal-container.hidden {
+            display: none;
+        }
+
+        #modal {
+            background: white;
+            width: calc(100vw - 6em);
+            max-width: 40em;
+            padding: 1em;
+            box-shadow: 0 0 40px #333;
+        }
+
+        #modal h1:first-child {
+            margin-top: 0;
+        }
+
+        #close-modal-button-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #update-cloudpilot-link {
+            margin-top: 1em;
+            display: block;
+        }
     </style>
 </head>
 
@@ -128,6 +167,7 @@
         <button id="reset-button" type="button">Reset!</button>
     </div>
 
+    <a href="javascript:" id="update-cloudpilot-link">Upgrade to new Cloudpilot app!</a>
     <div id="snapshot-indicator">No snapshot saved yet</div>
     <canvas id="canvas" width="160" height="220" tabindex="1"></canvas>
 
@@ -142,10 +182,59 @@
         <button class="palm-button" type="button" data-id="power">Power</button>
     </div>
 
+    <div id="modal-container">
+        <div id="modal">
+            <h1>A new version of Cloudpilot is available</h1>
+
+            <p>
+                Cloudpilot has received a major update. This new update replaces
+                this page with a full-fledged web app that can be used and installed
+                as an app on mobile devices.
+            </p>
+
+            <p>
+                Apart from a new UI the new version comes with multiple other improvements,
+                among which are support for several simultaneous emulation sessions,
+                audio and major performance improvements on Android.
+            </p>
+
+            <p>
+                In order to get a proper github.io domain, Cloudpilot has moved to
+                a Github organization. The new links are
+
+            <ul>
+                <li><a target="_blank" href="https://cloudpilot-emu.github.io/app">App</a></li>
+                <li><a target="_blank" href="https://cloudpilot-emu.github.io">Web page</a></li>
+                <li><a target="_blank" href="https://github.com/cloudpilot-emu/cloudpilot">Source code repository</a>
+                </li>
+            </ul>
+            </p>
+
+            <p>
+                You can continue to use this old version of the app, but it will not
+                be updated anymore. In order to migrate simply save an image of your
+                current session and import it in the new app.
+            </p>
+
+            <p>
+                This dialog will not show again on load, but you can view it again by
+                clicking the link below the controls.
+            </p>
+
+            <div>
+                <div id="close-modal-button-container">
+                    <button id="close-modal-button" type="button">Close dialog</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <pre id="console"></pre>
 
     <script src="src/cloudpilot.js"></script>
     <script>
+        document.getElementById('modal-container').style.display = 'none';
+
         (async function () {
             const DB_NAME = 'cloudpilot-sdl';
             const OBJECT_STORE_KVS = 'kvs';
@@ -174,11 +263,15 @@
             const romName = document.getElementById('rom-name');
             const consoleElt = document.getElementById('console');
             const canvasElt = document.getElementById('canvas');
+            const modal = document.getElementById('modal-container');
+            const closeModalButton = document.getElementById('close-modal-button');
+            const updateCloudpilotLink = document.getElementById('update-cloudpilot-link');
 
             const snapshotIndicator = document.getElementById('snapshot-indicator');
 
             const KEY_PAGE_LOCK = "cloudpilot-sdl-lock";
             const PAGE_LOCK_ERROR = new Error('page opened in another tab');
+            const KEY_UPDATE_NOTE_DISMISSED = "cloudpilot-sdl-update-note-dismissed";
 
             let kvs;
             let memoryPersistence;
@@ -237,6 +330,14 @@
                 }
 
                 return new Error(msg);
+            }
+
+            function showModal() {
+                modal.style.removeProperty('display');
+            }
+
+            function hideModal() {
+                modal.style.display = 'none';
             }
 
             function write32LE(value, target, i) {
@@ -989,6 +1090,14 @@
             // ####################################################################################
             // Bootstrap
             // ####################################################################################
+
+            closeModalButton.addEventListener('click', hideModal);
+            updateCloudpilotLink.addEventListener('click', showModal);
+
+            if (!localStorage.getItem(KEY_UPDATE_NOTE_DISMISSED)) {
+                showModal();
+                localStorage.setItem(KEY_UPDATE_NOTE_DISMISSED, "1");
+            }
 
             await setupDb();
 
