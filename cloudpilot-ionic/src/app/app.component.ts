@@ -25,26 +25,17 @@ export class AppComponent implements AfterViewInit {
         this.pwaService.invite();
 
         this.registerForUpdates();
-        this.checkForUpdate();
-    }
 
-    private async checkForUpdate(): Promise<void> {
-        const storedVersion = this.kvsService.kvs.version;
-
-        if (storedVersion === undefined) {
-            this.kvsService.kvs.version = REVISION;
-
-            return;
-        }
-
-        if (storedVersion === REVISION) return;
-
-        this.kvsService.kvs.version = REVISION;
-
-        // wait for a possible loader to disappear
-        await this.emulationService.bootstrapComplete();
-
-        this.alertService.message('Update complete', `Cloudpilot was updated to revision ${REVISION}.`);
+        this.alertService.message(
+            'Cloudpilot has moved',
+            `
+                Cloudpilot has moved to a
+                <a href="https://cloudpilot-emu.github.io">new location</a>.
+                <br/><br/>
+                This page will not be removed, but it will not receive any
+                further updates.
+            `
+        );
     }
 
     private registerForUpdates(): void {
